@@ -10,6 +10,8 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include "my_tools.h"
+
 void my_putchar(char c) {
     write(1, &c, 1);
 }
@@ -21,8 +23,6 @@ void my_putstr(const char *str) {
 }
 
 void my_putnbr(int n) {
-    if (n > 2147483647 || n < -2147483648)
-        return;
     if (n == -2147483648) {
         my_putstr("-2147483648");
         return;
@@ -38,6 +38,12 @@ void my_putnbr(int n) {
     my_putnbr(n / 10);
     my_putchar((n % 10) + '0');
     return;
+}
+
+char *my_strdup(const char *src) {
+    char *dest = malloc(my_strlen(src) + 1);
+    my_strcpy(dest, src);
+    return dest;
 }
 
 char *my_strcpy(char *dest, const char *src) {
@@ -85,6 +91,7 @@ char *setToZeroString(char *str) {
     for (int i = 0; str[i] != '\0'; i++) {
         str[i] = '0';
     }
+    return str;
 }
 
 int my_intLenghtComparator(unsigned x) {
