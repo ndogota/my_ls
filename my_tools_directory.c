@@ -31,7 +31,6 @@ int my_count_directory_files(char *directory_patch)
     } else {
         struct dirent * ent;
         for (; (ent = readdir(rep)) != NULL; directory_file_count++) {
-            ent->d_name;
         }
         closedir(rep);
     }
@@ -77,7 +76,7 @@ char **my_save_directory_files(char *directory_patch)
     } else {
         struct dirent * ent;
         for (int i = 0; i < directory_file_count && (ent = readdir(rep)) != NULL; i++) {
-            arrayOfFiles[i] = malloc(sizeof(ent->d_name));
+            arrayOfFiles[i] = malloc(my_strlen(ent->d_name) + 1);
             my_strcpy(arrayOfFiles[i], ent->d_name);
         }
         closedir(rep);
@@ -96,8 +95,7 @@ int my_countMultipleDirectoryFiles(char **arrayOfPaths, int arrayOfPathsLenght) 
                 exit(1);
             } else {
                 struct dirent * ent;
-                for (int i = 0;(ent = readdir(rep)) != NULL; i++) {
-                    ent->d_name;
+                while ((ent = readdir(rep)) != NULL) {
                     counter++;
                 }
                 closedir(rep);
@@ -110,8 +108,7 @@ int my_countMultipleDirectoryFiles(char **arrayOfPaths, int arrayOfPathsLenght) 
             exit(1);
         } else {
             struct dirent * ent;
-            for (int i = 0;(ent = readdir(rep)) != NULL; i++) {
-                ent->d_name;
+            while ((ent = readdir(rep)) != NULL) {
                 counter++;
             }
             closedir(rep);
@@ -126,21 +123,23 @@ char **my_saveMultipleDirectoryFiles(char **arrayOfPaths, int arrayOfPathsLenght
         char **arrayOfMultipleDirectoryFiles = (char **)malloc(sizeof(char *) * my_countMultipleDirectoryFiles(arrayOfPaths, arrayOfPathsLenght));
         int counter = 0;
         for (int i = 0; i < arrayOfPathsLenght; i++) {
+            int directory_file_count = my_count_directory_files(arrayOfPaths[i]);
             char **arrayOfDirectoryFiles = my_save_directory_files(arrayOfPaths[i]);
-            sort_alpha(arrayOfDirectoryFiles, my_count_directory_files(arrayOfPaths[i]));
+            sort_alpha(arrayOfDirectoryFiles, directory_file_count);
             DIR* rep = opendir(arrayOfPaths[i]);
             if (rep == NULL) {
                 perror("");
                 exit(1);
             } else {
                 struct dirent * ent;
-                for (int i = 0;(ent = readdir(rep)) != NULL; i++) {
-                    arrayOfMultipleDirectoryFiles[counter] = malloc(sizeof(ent->d_name));
-                    my_strcpy(arrayOfMultipleDirectoryFiles[counter], arrayOfDirectoryFiles[i]);
+                for (int j = 0; j < directory_file_count && (ent = readdir(rep)) != NULL; j++) {
+                    arrayOfMultipleDirectoryFiles[counter] = malloc(my_strlen(arrayOfDirectoryFiles[j]) + 1);
+                    my_strcpy(arrayOfMultipleDirectoryFiles[counter], arrayOfDirectoryFiles[j]);
                     counter++;
                 }
                 closedir(rep);
             }
+            cleanupStrings(arrayOfDirectoryFiles, directory_file_count);
         }
         returnedArray = arrayOfMultipleDirectoryFiles;
     } else {
