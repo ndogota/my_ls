@@ -15,7 +15,7 @@ char **my_save_arguments(int argc, char** argv) {
     if (argc > 1) {
         for (int i = 0; i < argc; i++) {
             if (i > 0) {
-                arrayOfArgv[i - 1] = malloc(sizeof(argv[i]));
+                arrayOfArgv[i - 1] = malloc(my_strlen(argv[i]) + 1);
                 my_strcpy(arrayOfArgv[i - 1], argv[i]);
             }
         }
@@ -47,7 +47,7 @@ char **my_save_paths(int argc, char **arrayOfArgv) {
     char **arrayOfPaths = (char **)malloc(sizeof(char *) * my_count_paths(argc, arrayOfArgv));
     for (int i = 0, j = 0; i < argc - 1; i++) {
         if (arrayOfArgv[i][0] != '-') {
-            arrayOfPaths[j] = malloc(sizeof(arrayOfArgv[j]));
+            arrayOfPaths[j] = malloc(my_strlen(arrayOfArgv[i]) + 1);
             my_strcpy(arrayOfPaths[j], arrayOfArgv[i]);
             j++;
         }
@@ -56,10 +56,10 @@ char **my_save_paths(int argc, char **arrayOfArgv) {
 }
 
 char **my_save_options(int argc, char **arrayOfArgv) {
-    char **arrayOfOptions = (char **)malloc(sizeof(char *) * my_count_paths(argc, arrayOfArgv));
+    char **arrayOfOptions = (char **)malloc(sizeof(char *) * my_count_options(argc, arrayOfArgv));
     for (int i = 0, j = 0; i < argc - 1; i++) {
         if (arrayOfArgv[i][0] == '-') {
-            arrayOfOptions[j] = malloc(sizeof(arrayOfArgv[j]));
+            arrayOfOptions[j] = malloc(my_strlen(arrayOfArgv[i]) + 1);
             my_strcpy(arrayOfOptions[j], arrayOfArgv[i]);
             j++;
         }

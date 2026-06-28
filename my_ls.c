@@ -40,5 +40,5 @@ void my_ls(int argc, char** argv) {
     cleanupStrings(arrayOfMultipleDirectoryFiles, countFiles);
     cleanupStrings(arrayOfPaths, countPaths);
     cleanupStrings(arrayOfOptions, countOptions);
-    cleanupStrings(arrayOfArgv, argc);
+    cleanupStrings(arrayOfArgv, argc - 1);
 }
