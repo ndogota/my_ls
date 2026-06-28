@@ -20,6 +20,7 @@
 #include "my_tools_directory.h"
 
 void interpretOptions(char **arrayOfPaths, char **arrayOfMultipleDirectoryFiles, char **arrayOfOptions, int arrayOfOptionsLenght, int arrayOfPathsLenght, int countFiles, int argc) {
+    (void)argc;
     for (int i = 0; i < arrayOfOptionsLenght && arrayOfOptionsLenght > 0; i++) {
         int optionLenght = my_strlen(arrayOfOptions[i]);
         if (optionLenght > 1 && optionLenght < 3) {
@@ -42,7 +43,7 @@ void interpretOptions(char **arrayOfPaths, char **arrayOfMultipleDirectoryFiles,
 }
 
 char *filePermissions(char *nameOfFile) {
-    char *filePermissionsString = malloc(sizeof(10));
+    char *filePermissionsString = malloc(11);
     struct stat fileStat;
     if(stat(nameOfFile, &fileStat) == 0) {
         filePermissionsString[0] = ((S_ISDIR(fileStat.st_mode)) ? 'd' : '-');
@@ -67,38 +68,52 @@ char **getUserAndGroup(int uid, int gid) {
     char **arrayOfUserAndGroup = (char **)malloc(sizeof(char *) * 2);
     struct group *grp;
     struct passwd *pwd;
+    char numberBuffer[16];
 
     pwd = getpwuid(uid);
     grp = getgrgid(gid);
 
-    arrayOfUserAndGroup[0] = pwd->pw_name;
-    my_strcat(arrayOfUserAndGroup[0], " ");
-    arrayOfUserAndGroup[1] = grp->gr_name;
+    if (pwd != NULL) {
+        arrayOfUserAndGroup[0] = my_strdup(pwd->pw_name);
+    } else {
+        snprintf(numberBuffer, sizeof(numberBuffer), "%d", uid);
+        arrayOfUserAndGroup[0] = my_strdup(numberBuffer);
+    }
+    if (grp != NULL) {
+        arrayOfUserAndGroup[1] = my_strdup(grp->gr_name);
+    } else {
+        snprintf(numberBuffer, sizeof(numberBuffer), "%d", gid);
+        arrayOfUserAndGroup[1] = my_strdup(numberBuffer);
+    }
 
     return arrayOfUserAndGroup;
 }
 
 int numberOfLinks(char *nameOfFile) {
     struct stat fileStat;
-    stat(nameOfFile, &fileStat);
+    if (stat(nameOfFile, &fileStat) != 0)
+        return 0;
     return fileStat.st_nlink;
 }
 
 int getUid(char *nameOfFile) {
     struct stat fileStat;
-    stat(nameOfFile, &fileStat);
+    if (stat(nameOfFile, &fileStat) != 0)
+        return 0;
     return fileStat.st_uid;
 }
 
 int getGid(char *nameOfFile) {
     struct stat fileStat;
-    stat(nameOfFile, &fileStat);
+    if (stat(nameOfFile, &fileStat) != 0)
+        return 0;
     return fileStat.st_gid;
 }
 
 int getSize(char *nameOfFile) {
     struct stat fileStat;
-    stat(nameOfFile, &fileStat);
+    if (stat(nameOfFile, &fileStat) != 0)
+        return 0;
     return fileStat.st_size;
 }
 
@@ -106,7 +121,10 @@ char *getLastModificationDate(char *nameOfFile) {
     struct stat attrib;
     char *time = malloc(50);
 
-    stat(nameOfFile, &attrib);
+    if (stat(nameOfFile, &attrib) != 0) {
+        time[0] = '\0';
+        return time;
+    }
     strftime(time, 50, "%b %d %H:%M", localtime(&attrib.st_mtime));
 
     return time;
